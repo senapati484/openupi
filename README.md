@@ -81,14 +81,35 @@ docker compose -f docker/docker-compose.yml up -d
 
 ### Step 2: Download & Pair the Android App
 
-1. **Download APK**: Download the **OpenUPI Daemon APK** from [SourceForge](https://sourceforge.net/projects/openupi/) or [GitHub Releases](https://github.com/senapati484/openupi/releases).
-2. Install on any Android device (Android 8+) with the SIM card that receives your bank SMS or has UPI apps installed.
-3. Open the app and grant:
-   - **SMS Permission** (`RECEIVE_SMS`) — for native bank credit SMS.
-   - **Notification Access** — for GPay, PhonePe, Paytm push notifications.
-   - **Battery Optimization Exemption** — ensures 24/7 background operation.
-4. Enter your **Server URL** (e.g. `https://pay.yourdomain.com`) and **Device Shared Secret**.
-5. Keep the phone plugged in and connected to Wi-Fi.
+1. **Download APK**: Download the latest **OpenUPI Daemon APK** (`openupi-daemon-v1.0.0.apk`) from [SourceForge](https://sourceforge.net/projects/openupi/) or [GitHub Releases](https://github.com/senapati484/openupi/releases).
+2. **Install on Phone**:
+
+> [!IMPORTANT]
+> **Google Play Protect Sideloading Notice**:
+> Because OpenUPI is a self-hosted payment listener that intercepts incoming UPI notifications and bank SMS alerts, Google Play Protect's automated scanner may block the sideload installation when downloaded outside the Play Store.
+> 
+> **To install smoothly:**
+> - **Method A (Phone Settings)**:
+>   1. Open the **Google Play Store** app on your phone.
+>   2. Tap your **Profile Icon** (top right) ➔ **Play Protect**.
+>   3. Tap the **Settings (⚙️)** gear icon in the top right.
+>   4. Turn **OFF** both:
+>      - **"Scan apps with Play Protect"**
+>      - **"Improve harmful app detection"**
+>   5. Open your phone's **Files / Downloads** app and install `openupi-daemon-v1.0.0.apk`. *(You can re-enable Play Protect after installation)*.
+> - **Method B (Via ADB — Direct Developer Sideload)**:
+>   ```bash
+>   adb install -r exports/openupi-daemon-v1.0.0.apk
+>   ```
+
+3. **Grant Required Permissions**:
+   - **Notification Access**: Tap **Enable** inside the app to allow the daemon to intercept UPI app payments (Google Pay, PhonePe, Paytm, BHIM, CRED, and Bank SMS alerts).
+   - **Android 13+ Restricted Settings**: If Android blocks notification access, go to phone **Settings ➔ Apps ➔ OpenUPI Daemon ➔ Tap 3 dots (⋮) in top-right ➔ Allow restricted settings**.
+   - **Battery Optimization Exemption**: Keep background execution exempt from OS sleep for 24/7 reliability.
+4. **Configure Credentials**:
+   - Enter your **Gateway Server URL** (e.g. `https://pay.yourdomain.com:4000`) and **Device Shared Secret** (`DAEMON_SHARED_SECRET` from `.env`).
+   - Tap **Save All Credentials**.
+5. **Keep the phone plugged in and connected to Wi-Fi 24/7**.
 
 ---
 

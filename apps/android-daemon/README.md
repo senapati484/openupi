@@ -27,28 +27,56 @@
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Installation & Sideloading Guide
 
 ### 1. Download the APK
-- Download the latest `openupi-daemon.apk` from [SourceForge](https://sourceforge.net/projects/openupi/) or [GitHub Releases](https://github.com/senapati484/openupi/releases).
-- Install on any dedicated Android phone (Android 8.0+ / API 26+).
+- Download the latest **`openupi-daemon-v1.0.0.apk`** from [SourceForge](https://sourceforge.net/projects/openupi/) or [GitHub Releases](https://github.com/senapati484/openupi/releases).
 
-### 2. Grant Permissions
-When you open the app, you will be prompted to grant 3 key permissions:
-- **SMS Permission** (`RECEIVE_SMS`, `READ_SMS`): Required to intercept bank credit SMS alerts.
-- **Notification Access**: Required to read GPay, PhonePe, and Paytm transaction notifications.
-- **Battery Optimization Exemption**: Required to ensure Android OS never sleeps or kills the background daemon.
+---
 
-### 3. Configure Settings
-Open the **Credentials & Links** tab in the app and enter:
-- **Gateway Server URL**: Your backend URL (e.g. `https://pay.yourdomain.com`).
-- **Device Shared Secret**: The 32-byte secret key matching `DEVICE_SHARED_SECRET` in your server's `.env`.
-- **Merchant VPA**: Your UPI ID (e.g. `yourbusiness@okaxis`).
-- **Merchant Name**: Your business name displayed during UPI checkout.
+### 2. Google Play Protect Sideloading Notice (Important)
+Because OpenUPI is a self-hosted financial listener that reads incoming UPI transaction alerts, Google Play Protect's automated heuristic scanner will flag/block sideloading when installed outside the Play Store.
 
-### 4. Hardware Best Practice
-- Keep the phone connected to power and Wi-Fi 24/7.
-- Insert the SIM card linked to your business bank account.
+#### How to install:
+- **Option A (Phone Play Store Settings)**:
+  1. Open the **Google Play Store** app.
+  2. Tap your **Profile Icon** (top right) ➔ **Play Protect**.
+  3. Tap the **Settings (⚙️)** gear in the top-right corner.
+  4. Turn **OFF** both:
+     - **"Scan apps with Play Protect"**
+     - **"Improve harmful app detection"**
+  5. Open your phone's **Files / Downloads** app and install `openupi-daemon-v1.0.0.apk`.
+- **Option B (Via ADB — Direct Developer Sideload)**:
+  ```bash
+  adb install -r exports/openupi-daemon-v1.0.0.apk
+  ```
+
+---
+
+### 3. Grant Permissions & Unlock Restricted Settings (Android 13+)
+1. **Notification Access**: Tap **Enable** inside the app to allow the daemon to intercept UPI app payments (Google Pay, PhonePe, Paytm, BHIM, CRED, Bank apps, and Bank SMS alerts).
+2. **Android 13+ Restricted Settings**: If Android blocks the toggle with *"Restricted setting"*:
+   - Go to phone **Settings ➔ Apps ➔ OpenUPI Daemon**.
+   - Tap the **3 vertical dots (⋮)** in the top-right corner ➔ **"Allow restricted settings"** (authenticate with Fingerprint/PIN).
+   - Return to OpenUPI Daemon and toggle on **Notification Listener**.
+3. **Battery Optimization Exemption**: Keep background execution exempt from OS battery killing for 24/7 reliability.
+
+---
+
+### 4. Configure Backend Credentials
+Open the **Credentials** tab in the app:
+- **Gateway Server URL** (`REQUIRED`): Your Fastify backend URL (e.g. `https://pay.yourdomain.com:4000`).
+- **Device Shared Secret** (`REQUIRED`): The 32-byte secret key matching `DAEMON_SHARED_SECRET` in `.env`.
+- **Fallback Webhook URL** (`OPTIONAL`): Secondary failover URL if primary server is unreachable.
+- **Merchant VPA / Name** (`OPTIONAL`): Your business UPI ID (e.g. `merchant@okaxis`) for in-app test QRs.
+
+Tap **Save All Credentials**.
+
+---
+
+### 5. Hardware Best Practices
+- Keep the dedicated phone connected to power and Wi-Fi 24/7.
+- Ensure the phone receives push notifications from your business UPI & Banking apps.
 
 ---
 
