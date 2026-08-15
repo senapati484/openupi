@@ -2,6 +2,8 @@
 
 > **Version:** 1.0.0  
 > **Repository:** [https://github.com/senapati484/openupi.git](https://github.com/senapati484/openupi.git)  
+> **NPM Package:** [https://www.npmjs.com/package/openupi-sdk](https://www.npmjs.com/package/openupi-sdk)  
+> **SourceForge APK Distribution:** [https://sourceforge.net/projects/openupi/](https://sourceforge.net/projects/openupi/)  
 > **Author / Maintainer:** Sayan Senapati  
 > **License:** MIT  
 
