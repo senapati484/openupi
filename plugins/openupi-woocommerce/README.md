@@ -3,6 +3,12 @@
 > **Zero-Fee UPI Payment Gateway Plugin for WordPress / WooCommerce.**  
 > Accept payments directly into your bank account with no intermediary gateway deductions (0% fees).
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=blue&label=npm%20openupi-sdk" alt="npm" /></a>
+  <a href="https://sourceforge.net/projects/openupi/"><img src="https://img.shields.io/badge/Download%20APK-SourceForge-brightgreen" alt="Download APK on SourceForge" /></a>
+  <a href="https://github.com/senapati484/openupi/releases"><img src="https://img.shields.io/github/v/release/senapati484/openupi?label=GitHub%20Release" alt="GitHub Release" /></a>
+</p>
+
 ---
 
 ## 🛍️ Installation

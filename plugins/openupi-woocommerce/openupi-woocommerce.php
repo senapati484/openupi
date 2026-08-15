@@ -1,13 +1,14 @@
 <?php
 /**
  * Plugin Name:       OpenUPI for WooCommerce
- * Plugin URI:        https://github.com/yourname/open-upi
+ * Plugin URI:        https://github.com/senapati484/openupi
  * Description:       Zero-fee UPI payment gateway for WooCommerce using your self-hosted OpenUPI server.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Tested up to:      6.5
  * Requires PHP:      8.0
  * Author:            Sayan Senapati
+ * Author URI:        https://github.com/senapati484
  * License:           MIT
  * Text Domain:       openupi-woocommerce
  */
