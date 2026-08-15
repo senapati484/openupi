@@ -7,7 +7,7 @@ set -euo pipefail
 # the gateway with production hardening.
 # ============================================================================
 
-REPO_URL="https://github.com/yourname/open-upi"  # Update before publishing
+REPO_URL="https://github.com/senapati484/openupi.git"
 INSTALL_DIR="/opt/open-upi"
 ENV_FILE="$INSTALL_DIR/.env"
 

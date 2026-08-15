@@ -1,151 +1,229 @@
-# OpenUPI — Self-Hosted Zero-Fee UPI Payment Gateway
+# OpenUPI — Zero-Fee, Self-Hosted UPI Payment Gateway
 
-> Accept UPI payments on your own server. No payment gateway fees. No middlemen. Full control.
+> **Accept UPI payments on your website or app with 0% gateway fees.**  
+> Direct settlement into your bank account. No middlemen. Fully automated order matching.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org)
-[![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](docker/docker-compose.yml)
+<p align="center">
+  <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=blue&label=npm%20openupi-sdk" alt="npm openupi-sdk" /></a>
+  <a href="https://sourceforge.net/projects/openupi/"><img src="https://img.shields.io/badge/Download%20APK-SourceForge-brightgreen" alt="Download APK on SourceForge" /></a>
+  <a href="https://github.com/senapati484/openupi/releases"><img src="https://img.shields.io/github/v/release/senapati484/openupi?label=GitHub%20Release" alt="GitHub Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="License: MIT" /></a>
+</p>
 
 ---
 
-## How It Works
-
-1. **Android Daemon** — An Android app installed on a dedicated phone listens to bank SMS and UPI app notifications.
-2. **Paise Offset** — Each order gets a unique exact amount (e.g. ₹99.04 instead of ₹99.00), enabling deterministic matching.
-3. **Backend Server** — Fastify + MongoDB + Redis matches incoming bank credits to pending orders in milliseconds.
-4. **Webhook Delivery** — BullMQ delivers a signed webhook to your application (5 retries, exponential backoff).
-5. **Dashboard** — Admin web panel to view transactions, unmatched credits, reconcile manually, and export ledger CSV.
-
-## Architecture
+## 💡 How It Works
 
 ```
-Customer → UPI App → Bank → [Bank Notification on Android Phone]
-                                    ↓
-                         Android Daemon (HMAC-signed POST)
-                                    ↓
-              Fastify Backend → Redis Paise Locker → MongoDB Matching
-                                    ↓
-                        BullMQ → Your Webhook Endpoint
+ ┌────────────────────────┐
+ │   Customer on Website  │
+ │  (Scans dynamic QR)    │
+ └───────────┬────────────┘
+             │ 1. Pays exact paise amount (e.g. ₹499.04) via GPay/PhonePe/Paytm
+             ▼
+ ┌────────────────────────┐
+ │   Merchant Bank / UPI  │
+ └───────────┬────────────┘
+             │ 2. Sends Credit SMS / App Notification
+             ▼
+ ┌────────────────────────┐
+ │  OpenUPI Android App   │  ◄── Download APK from SourceForge / GitHub
+ │  (SMS/Notif Intercept) │
+ └───────────┬────────────┘
+             │ 3. HMAC-signed POST dispatch (Offline queue + TTS alert)
+             ▼
+ ┌────────────────────────┐
+ │  OpenUPI Backend Server│  ◄── 1 Docker container running 24/7
+ │  (Fastify + Redis + DB)│
+ └───────────┬────────────┘
+             │ 4. Deterministic matching + Real-time SSE push + Webhook
+             ▼
+ ┌────────────────────────┐
+ │  Merchant Store / App  │  ◄── Integrated with `openupi-sdk` (npm)
+ │  (Order Confirmed ✓)   │
+ └────────────────────────┘
 ```
 
-## Monorepo Structure
+---
 
-```
-open-upi/
-├── apps/
-│   ├── backend-server/     # Fastify TypeScript API
-│   └── android-daemon/     # Kotlin notification listener app
-├── packages/
-│   └── openupi-sdk/        # openupi-sdk — dual ESM/CJS npm package with /react subpath
-├── plugins/
-│   └── openupi-woocommerce/ # WordPress/WooCommerce plugin
-├── docker/                 # Dockerfile + docker-compose.yml
-├── scripts/                # install.sh + test-e2e.ts
-├── tests/                  # Vitest test suite
-└── .github/workflows/      # CI/CD — test, Docker push, npm publish
-```
+## ⚡ The 3-Step Setup
 
-## Quick Start
+### Step 1: Run the Backend Gateway (Takes 1 minute)
 
-### 1. Server (VPS/Ubuntu)
+Run the single-container backend server on your VPS, local machine, or home server:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourname/open-upi/main/scripts/install.sh | sudo bash
-```
+# 1. Clone repository
+git clone https://github.com/senapati484/openupi.git
+cd openupi
 
-Or manually:
-
-```bash
-git clone https://github.com/yourname/open-upi
-cd open-upi
+# 2. Configure environment
 cp .env.example .env
-# Edit .env: set MERCHANT_VPA, MERCHANT_NAME, generate secrets
+# Open .env and set:
+#   MERCHANT_VPA=yourbusiness@okaxis
+#   MERCHANT_NAME="My Business"
+#   DEVICE_SHARED_SECRET=your_secret_key_32_chars
+#   MERCHANT_API_KEY=sk_live_your_api_key_16_chars
+
+# 3. Start server with Docker
 docker compose -f docker/docker-compose.yml up -d
 ```
 
-### 2. Android App
+*(Your gateway API will be live on `http://YOUR_SERVER_IP:4000`, with admin dashboard on `http://YOUR_SERVER_IP:3000`)*
 
-1. Open `apps/android-daemon` in Android Studio.
-2. Build and install on a **dedicated Android phone** (Android 8+).
-3. Grant **Notification Listener** permission.
-4. Enter your server URL and Device Secret in the app.
-5. Request battery optimization exemption.
-6. Place the phone on charge — it must stay plugged in 24/7.
+---
 
-### 3. Integrate (Node.js)
+### Step 2: Download & Pair the Android App
+
+1. **Download APK**: Download the **OpenUPI Daemon APK** from [SourceForge](https://sourceforge.net/projects/openupi/) or [GitHub Releases](https://github.com/senapati484/openupi/releases).
+2. Install on any Android device (Android 8+) with the SIM card that receives your bank SMS or has UPI apps installed.
+3. Open the app and grant:
+   - **SMS Permission** (`RECEIVE_SMS`) — for native bank credit SMS.
+   - **Notification Access** — for GPay, PhonePe, Paytm push notifications.
+   - **Battery Optimization Exemption** — ensures 24/7 background operation.
+4. Enter your **Server URL** (e.g. `https://pay.yourdomain.com`) and **Device Shared Secret**.
+5. Keep the phone plugged in and connected to Wi-Fi.
+
+---
+
+### Step 3: Install `openupi-sdk` on Your Website / App
 
 ```bash
 npm install openupi-sdk
 ```
 
+#### A. Backend: Create Payment Order & Verify Webhooks (Node.js / Express / Next.js API)
+
 ```typescript
-import { OpenUPI } from 'openupi-sdk';
+import { OpenUPI, verifyWebhookSignature } from 'openupi-sdk';
 
 const upi = new OpenUPI({
   apiUrl: 'https://pay.yourdomain.com',
   apiKey: process.env.OPENUPI_API_KEY!,
 });
 
-// Create a payment order
-const order = await upi.orders.create({ orderId: 'ORD_001', amount: 499 });
-// → { exactAmount: 499.04, qrSvg: '...', upiIntent: 'upi://pay?...' }
-```
+// 1. Create a payment order with unique paise offset (e.g. ₹499.04)
+app.post('/api/checkout', async (req, res) => {
+  const order = await upi.orders.create({
+    orderId: `ORD_${Date.now()}`,
+    amount: 499,
+    note: 'Pro Plan Upgrade',
+    callbackUrl: 'https://yourdomain.com/api/webhooks/openupi',
+  });
 
-### 4. Verify Webhooks
+  res.json({ order });
+});
 
-```typescript
-import { verifyWebhookSignature } from 'openupi-sdk';
-
-app.post('/webhook', express.raw({ type: '*/*' }), (req, res) => {
-  const valid = verifyWebhookSignature({
+// 2. Webhook endpoint: Called automatically when payment is confirmed
+app.post('/api/webhooks/openupi', express.raw({ type: '*/*' }), (req, res) => {
+  const isValid = verifyWebhookSignature({
     rawBody: req.body.toString(),
     signature: req.headers['x-openupi-signature'] as string,
     timestamp: req.headers['x-openupi-timestamp'] as string,
     secret: process.env.OPENUPI_API_KEY!,
   });
-  if (!valid) return res.status(401).send('Unauthorized');
-  // Mark order as paid
+
+  if (!isValid) return res.status(401).send('Unauthorized');
+
+  const payload = JSON.parse(req.body.toString());
+  console.log(`Payment confirmed! Order: ${payload.orderId}, UTR: ${payload.utr}`);
+
+  // Unlock user subscription / fulfill order
   res.json({ received: true });
 });
 ```
 
-### 5. Frontend Checkout (React / Next.js)
+#### B. Frontend: Drop-In React Checkout Widget (React / Next.js)
 
 ```tsx
-import { UPICheckoutModal } from 'openupi-sdk/react';
+import { UPICheckoutModal, UPICheckoutButton } from 'openupi-sdk/react';
 
-<UPICheckoutModal
-  orderId={order.orderId}
-  exactAmount={order.exactAmount}
-  qrSvg={order.qrSvg}
-  upiIntent={order.upiIntent}
-  gatewayUrl="https://pay.yourdomain.com"
-  onSuccess={({ utr }) => console.log('Paid:', utr)}
-/>
+export function CheckoutModal({ order, onClose }) {
+  return (
+    <UPICheckoutModal
+      orderId={order.orderId}
+      exactAmount={order.exactAmount}
+      qrSvg={order.qrSvg}
+      upiIntent={order.upiIntent}
+      gatewayUrl="https://pay.yourdomain.com"
+      onSuccess={({ utr }) => {
+        alert(`Payment successful! UTR: ${utr}`);
+        window.location.href = '/dashboard';
+      }}
+      onExpire={() => {
+        alert('Order expired. Please regenerate QR.');
+      }}
+    />
+  );
+}
 ```
 
-## API Reference
+---
 
-| Endpoint | Auth | Description |
+## 🌟 Key Features
+
+| Feature | Description |
+|---|---|
+| 💸 **0% Transaction Fees** | Money settles directly from customer's bank account to yours. |
+| ⚡ **Sub-Second Confirmation** | Android daemon dispatches within ~300ms of receiving SMS/notification. |
+| 🛡️ **Replay & Timing-Safe Security** | HMAC-SHA256 device authentication with strict 5-minute timestamp drift window. |
+| 📱 **Dual Redundancy Interception** | Native SMS (`Telephony.SMS_RECEIVED`) + Notification Listener (`NotificationListenerService`). |
+| 🔊 **Built-in Soundbox TTS** | Audio announcement through phone speaker ("Received ₹499 on UPI"). |
+| 🔄 **Offline Queue with Retry** | Room DB queue on device retries dispatches when phone regains internet. |
+| 📊 **Admin Dashboard** | Real-time transaction ledger, unmatched credit resolver, daemon battery telemetry, and CSV export. |
+| 🛒 **WooCommerce Plugin** | Ready-to-use WordPress plugin included in `plugins/openupi-woocommerce/`. |
+
+---
+
+## 📁 Repository Structure
+
+```
+openupi/
+├── apps/
+│   ├── backend-server/          # Fastify + MongoDB + Redis + BullMQ Gateway
+│   ├── android-daemon/          # Kotlin Android Daemon App (SMS/Push Listener)
+│   └── dashboard/               # Next.js 14 Admin Control Panel
+├── packages/
+│   └── openupi-sdk/             # Official npm SDK (Node client + React widgets)
+├── plugins/
+│   └── openupi-woocommerce/      # WordPress / WooCommerce Payment Plugin
+├── examples/
+│   └── merchant-store/          # Complete Express + React store integration demo
+├── docker/                      # Multi-stage Dockerfile & docker-compose.yml
+├── scripts/
+│   ├── install.sh               # 1-command VPS installer
+│   └── test-e2e.ts              # E2E simulation script
+└── tests/                       # Multi-bank SMS & notification test suite
+```
+
+---
+
+## 🛠️ API Reference
+
+| Method & Path | Auth | Description |
 |---|---|---|
-| `POST /api/v1/orders/create` | `x-api-key` | Create payment order + QR |
-| `GET /api/v1/orders/:id/status` | `x-api-key` | Check order status |
-| `GET /api/v1/orders/:id/stream` | None | SSE real-time status stream |
-| `POST /api/v1/internal/ingest` | HMAC | Android daemon payment report |
-| `POST /api/v1/internal/heartbeat` | HMAC | Android daemon liveness ping |
+| `POST /api/v1/orders/create` | `x-api-key` | Create payment order with exact paise allocation |
+| `GET /api/v1/orders/:id/status` | `x-api-key` | Query order status (`PENDING`, `PAID`, `EXPIRED`) |
+| `GET /api/v1/orders/:id/stream` | None | Server-Sent Events (SSE) stream for real-time frontend updates |
+| `POST /api/v1/internal/ingest` | HMAC | Android daemon payment dispatch endpoint |
+| `POST /api/v1/internal/heartbeat` | HMAC | Daemon liveness, battery %, and connectivity ping |
 | `GET /api/v1/admin/transactions` | `x-api-key` | Paginated transaction ledger |
-| `GET /api/v1/admin/unmatched` | `x-api-key` | Unmatched credits list |
-| `POST /api/v1/admin/reconcile` | `x-api-key` | Manual reconciliation |
-| `GET /api/v1/admin/export/csv` | `x-api-key` | Download CSV ledger |
-| `GET /health` | None | Gateway health check |
+| `GET /api/v1/admin/unmatched` | `x-api-key` | List unmatched bank credits |
+| `POST /api/v1/admin/reconcile` | `x-api-key` | Manually match an unmatched credit to an order |
+| `GET /api/v1/admin/export/csv` | `x-api-key` | Download CSV accounting ledger |
+| `GET /health` | None | Gateway & daemon health check |
 
-## Limitations
+---
 
-- **Capacity**: Max 99 concurrent orders at the same base amount per VPA.
-- **Refunds**: Manual only (reverse UPI intent — customer must scan a new QR).
-- **Reliability**: Requires a dedicated Android device, plugged in, connected to Wi-Fi 24/7.
-- **Compliance**: Use a Current Account (P2M) — P2P limits apply on savings accounts.
+## ⚠️ Notes & Production Best Practices
 
-## License
+1. **Current Account (P2M)**: It is recommended to use a Current Bank Account (P2M VPA) to avoid P2P transaction count limits.
+2. **Dedicated Android Device**: Keep a dedicated Android phone connected to power and Wi-Fi 24/7.
+3. **Paise Offsets**: OpenUPI uses 2-decimal offsets (`.01` to `.99`), supporting up to 99 concurrent unpaid orders of the exact same base amount per VPA.
+4. **Refunds**: Since UPI push transactions do not provide programmatic pull/refund APIs, refunds are processed via reverse UPI intent.
 
-MIT — built for developers who want full control over their payment infrastructure.
+---
+
+## 📄 License
+
+MIT License © 2026 Sayan Senapati. Free and open-source for personal and commercial use.
