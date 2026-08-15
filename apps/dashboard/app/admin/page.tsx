@@ -54,7 +54,17 @@ export default function AdminDashboard() {
     <div style={s.page}>
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div style={s.header}>
-        <h1 style={s.title}>⚡ OpenUPI Admin</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <img
+            src="/openupi.png"
+            alt="OpenUPI Logo"
+            style={{ width: 42, height: 42, borderRadius: 10, objectFit: 'contain', background: '#000', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}
+          />
+          <div>
+            <h1 style={s.title}>OpenUPI Admin</h1>
+            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>Zero-Fee Self-Hosted Payment Gateway</div>
+          </div>
+        </div>
         <div style={s.daemonBadge(health?.daemonConnected)}>
           {health?.daemonConnected ? '🟢 Daemon Online' : '🔴 Daemon Offline'}
           {health?.telemetry && (

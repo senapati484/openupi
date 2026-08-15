@@ -1,7 +1,13 @@
-# OpenUPI — Zero-Fee, Self-Hosted UPI Payment Gateway
+<p align="center">
+  <img src="public/openupi.png" width="140" height="140" alt="OpenUPI Logo" style="border-radius: 20%;" />
+</p>
 
-> **Accept UPI payments on your website or app with 0% gateway fees.**  
-> Direct settlement into your bank account. No middlemen. Fully automated order matching.
+<h1 align="center">OpenUPI</h1>
+
+<p align="center">
+  <b>Zero-Fee, Self-Hosted UPI Payment Gateway for Merchants & Developers</b><br />
+  Direct settlement into your bank account. No middlemen. Fully automated order matching.
+</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=blue&label=npm%20openupi-sdk" alt="npm openupi-sdk" /></a>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useUPIStatus } from './useUPIStatus.js';
+import { OpenUPILogo } from './OpenUPILogo.js';
 
 export interface UPICheckoutModalProps {
   orderId: string;
@@ -85,8 +86,11 @@ export const UPICheckoutModal: React.FC<UPICheckoutModalProps> = ({
       textAlign: 'center',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      <div style={{ display: 'inline-block', backgroundColor: '#F0FDF4', color: '#15803D', padding: '4px 12px', borderRadius: '999px', fontSize: '11px', fontWeight: 700, marginBottom: '10px' }}>
-        ⚡ ZERO EXTRA FEES • DIRECT BANK SETTLEMENT
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
+        <OpenUPILogo size={22} variant="mark" />
+        <span style={{ backgroundColor: '#F0FDF4', color: '#15803D', padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 700 }}>
+          ZERO EXTRA FEES • DIRECT SETTLEMENT
+        </span>
       </div>
 
       <h3 style={{ margin: '0 0 4px 0', fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>
@@ -190,6 +194,11 @@ export const UPICheckoutModal: React.FC<UPICheckoutModalProps> = ({
             )}
           </div>
         )}
+      </div>
+
+      <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+        <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 500 }}>Secured by</span>
+        <OpenUPILogo size={14} variant="full" />
       </div>
     </div>
   );

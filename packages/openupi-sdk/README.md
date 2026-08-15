@@ -1,10 +1,24 @@
-# openupi-sdk
+<p align="center">
+  <a href="https://github.com/senapati484/openupi">
+    <img src="https://raw.githubusercontent.com/senapati484/openupi/main/public/openupi.png" width="120" height="120" alt="OpenUPI Logo" style="border-radius: 20%;" />
+  </a>
+</p>
 
-> Universal JavaScript / TypeScript SDK & React UI widgets for OpenUPI — zero-fee self-hosted UPI payment gateway.
+<h1 align="center">openupi-sdk</h1>
+
+<p align="center">
+  <b>Universal TypeScript / JavaScript SDK & React UI Widgets for OpenUPI</b><br />
+  Zero-Fee, Self-Hosted UPI Payment Gateway Integration.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=blue&label=npm%20openupi-sdk" alt="npm openupi-sdk" /></a>
+  <a href="https://github.com/senapati484/openupi/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="License: MIT" /></a>
+</p>
 
 Dual ESM/CJS support with optimized subpath exports:
 - `openupi-sdk` (Root): Node.js client, order creation, transaction ledgers, HMAC webhook verification, and core TypeScript interfaces.
-- `openupi-sdk/react`: Drop-in checkout widgets (`UPICheckoutModal`, `UPICheckoutButton`, `UPIQRCode`), prebuilt admin dashboard (`UPIMerchantDashboard`), and headless SSE status hook (`useUPIStatus`).
+- `openupi-sdk/react`: Drop-in checkout widgets (`UPICheckoutModal`, `UPICheckoutButton`, `UPIQRCode`, `OpenUPILogo`), prebuilt admin dashboard (`UPIMerchantDashboard`), and headless SSE status hook (`useUPIStatus`).
 
 ---
 

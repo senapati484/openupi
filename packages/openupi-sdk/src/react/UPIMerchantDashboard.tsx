@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { OpenUPILogo } from './OpenUPILogo.js';
 
 export interface UPIMerchantDashboardProps {
   gatewayUrl: string;
@@ -55,7 +56,7 @@ interface DaemonHealth {
 export const UPIMerchantDashboard: React.FC<UPIMerchantDashboardProps> = ({
   gatewayUrl,
   apiKey,
-  title = '⚡ OpenUPI Merchant Console',
+  title = 'OpenUPI Merchant Console',
   refreshIntervalMs = 10000
 }) => {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -104,9 +105,12 @@ export const UPIMerchantDashboard: React.FC<UPIMerchantDashboardProps> = ({
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <div>
-          <h2 style={styles.title}>{title}</h2>
-          <span style={styles.subtitle}>Self-Hosted Zero-Fee Payment Infrastructure</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <OpenUPILogo size={36} variant="mark" dark={false} />
+          <div>
+            <h2 style={styles.title}>{title}</h2>
+            <span style={styles.subtitle}>Self-Hosted Zero-Fee Payment Infrastructure</span>
+          </div>
         </div>
         <div style={styles.badge(health?.daemonConnected)}>
           {health?.daemonConnected ? '🟢 Listener Daemon Online' : '🔴 Daemon Offline'}
