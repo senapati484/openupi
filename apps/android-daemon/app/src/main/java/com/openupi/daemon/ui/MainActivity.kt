@@ -158,16 +158,7 @@ fun ConsoleTab() {
     val logEntries = remember { mutableStateListOf<String>() }
     val listState = rememberLazyListState()
 
-    var hasSmsPermission by remember {
-        mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED)
-    }
     val isNotifListenerActive = isNotificationListenerEnabled(context)
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        hasSmsPermission = permissions[Manifest.permission.RECEIVE_SMS] == true
-    }
 
     LaunchedEffect(Unit) {
         LiveLogBus.events.collect { entry ->
@@ -178,25 +169,15 @@ fun ConsoleTab() {
 
     Column(Modifier.fillMaxSize()) {
         // Status Alerts
-        if (!isNotifListenerActive || !hasSmsPermission) {
+        if (!isNotifListenerActive) {
             Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF7F1D1D)), modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                 Column(Modifier.padding(12.dp)) {
-                    Text("⚠️ Required Permissions Missing", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("⚠️ Required Permission Missing", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     Spacer(Modifier.height(4.dp))
-                    if (!isNotifListenerActive) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("• Notification Listener disabled", color = Color(0xFFFCA5A5), fontSize = 12.sp, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
-                                Text("Enable", color = Color(0xFFFBBF24), fontSize = 12.sp)
-                            }
-                        }
-                    }
-                    if (!hasSmsPermission) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("• SMS Permission disabled", color = Color(0xFFFCA5A5), fontSize = 12.sp, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { permissionLauncher.launch(arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS)) }) {
-                                Text("Grant", color = Color(0xFFFBBF24), fontSize = 12.sp)
-                            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("• Notification Listener disabled", color = Color(0xFFFCA5A5), fontSize = 12.sp, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
+                            Text("Enable", color = Color(0xFFFBBF24), fontSize = 12.sp)
                         }
                     }
                 }
