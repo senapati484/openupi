@@ -16,9 +16,6 @@
     <!-- Restart daemon after device reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Battery status for heartbeat telemetry -->
-    <uses-permission android:name="android.permission.BATTERY_STATS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -41,7 +38,11 @@
         <service
             android:name=".service.KeepAliveService"
             android:foregroundServiceType="specialUse"
-            android:exported="false" />
+            android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Payment listener keep-alive daemon" />
+        </service>
 
         <!-- Main UI Activity -->
         <activity
