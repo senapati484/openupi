@@ -43,12 +43,19 @@ export interface OrderStatusResponse {
   createdAt: string;
 }
 
+export interface ClaimUtrResponse {
+  success: boolean;
+  status: string;
+  message: string;
+  utr?: string;
+}
+
 export interface PaymentWebhookPayload {
   orderId: string;
   baseAmount: number;
   exactAmount: number;
   utr: string;
-  status: 'PAID' | 'FAILED' | 'EXPIRED';
+  status: 'PAID' | 'FAILED' | 'EXPIRED' | 'PAID_LATE';
 }
 
 export interface TransactionItem {
@@ -66,4 +73,17 @@ export interface AdminStatsResponse {
   settledCount: number;
   pendingCount: number;
   unmatchedCount: number;
+}
+
+export interface WebhookHandlerOptions {
+  /** Merchant Secret Key for verifying HMAC signature */
+  secret: string;
+  /** Handler called when a payment is verified as PAID */
+  onPaymentSuccess: (event: PaymentWebhookPayload) => Promise<void> | void;
+  /** Optional handler called if a payment arrives late after expiration */
+  onPaymentLate?: (event: PaymentWebhookPayload) => Promise<void> | void;
+  /** Optional error handler */
+  onError?: (err: Error) => void;
+  /** Signature timestamp tolerance window in milliseconds (default: 300000 / 5 mins) */
+  toleranceMs?: number;
 }

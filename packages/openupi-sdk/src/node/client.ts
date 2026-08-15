@@ -3,6 +3,7 @@ import type {
   CreateOrderParams,
   OrderResponse,
   OrderStatusResponse,
+  ClaimUtrResponse,
   AdminStatsResponse,
   TransactionItem,
   PaymentWebhookPayload
@@ -69,6 +70,18 @@ export class OpenUPI {
       });
       if (!res.ok) throw new Error(`[OpenUPI] Failed to fetch order status for ${orderId}`);
       return res.json() as Promise<OrderStatusResponse>;
+    },
+
+    /**
+     * Reconciles an order with a customer or merchant provided 12-digit UTR.
+     */
+    claimUtr: async (orderId: string, utr: string): Promise<ClaimUtrResponse> => {
+      const res = await fetch(`${this.baseUrl}/api/v1/orders/${orderId}/claim-utr`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ utr })
+      });
+      return res.json() as Promise<ClaimUtrResponse>;
     },
 
     /**

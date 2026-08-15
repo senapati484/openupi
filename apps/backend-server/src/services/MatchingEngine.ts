@@ -106,3 +106,65 @@ export async function matchAndSettle(payload: IngestPayload): Promise<MatchResul
     reason: `No active PENDING or recently EXPIRED order found for ₹${amount.toFixed(2)}`,
   };
 }
+
+/**
+ * Manually or customer-initiated UTR reconciliation for a specific order.
+ */
+export async function claimUtrForOrder(orderId: string, utr: string): Promise<{ success: boolean; status: string; message: string }> {
+  const normalizedUtr = utr.trim();
+  const order = await Order.findOne({ orderId });
+  if (!order) return { success: false, status: 'NOT_FOUND', message: 'Order not found' };
+
+  if (order.status === 'PAID' || order.status === 'PAID_LATE') {
+    return { success: true, status: order.status, message: 'Order is already settled' };
+  }
+
+  // 1. Check if an unmatched credit exists with this exact UTR
+  const credit = await UnmatchedCredit.findOne({ utr: normalizedUtr, resolved: false });
+  if (credit) {
+    order.status = 'PAID';
+    order.utr = normalizedUtr;
+    order.paidAt = new Date();
+    await order.save();
+
+    credit.resolved = true;
+    credit.resolvedOrderId = orderId;
+    await credit.save();
+
+    await releasePaiseSlot(order.exactAmount);
+
+    if (order.callbackUrl) {
+      await webhookQueue.add('deliver', {
+        orderId: order.orderId,
+        baseAmount: order.baseAmount,
+        exactAmount: order.exactAmount,
+        utr: normalizedUtr,
+        status: 'PAID',
+        callbackUrl: order.callbackUrl,
+        merchantSecret: process.env.MERCHANT_API_KEY!,
+      });
+    }
+
+    await notifyPaymentSettled({
+      orderId: order.orderId,
+      baseAmount: order.baseAmount,
+      exactAmount: order.exactAmount,
+      utr: normalizedUtr,
+    });
+
+    return { success: true, status: 'PAID', message: `Successfully reconciled with bank credit ₹${credit.amount}` };
+  }
+
+  // 2. Check if UTR was already matched to another order
+  const existingOrder = await Order.findOne({ utr: normalizedUtr, orderId: { $ne: orderId } });
+  if (existingOrder) {
+    return { success: false, status: 'DUPLICATE_UTR', message: 'This UTR has already been claimed by another order' };
+  }
+
+  return {
+    success: false,
+    status: 'PENDING_BANK_CREDIT',
+    message: 'Bank credit with this UTR has not arrived yet. Please wait a few seconds.',
+  };
+}
+

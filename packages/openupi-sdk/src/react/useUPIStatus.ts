@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export interface UPIStatusState {
-  status: 'PENDING' | 'PAID' | 'EXPIRED' | 'ERROR';
+  status: 'PENDING' | 'PAID' | 'EXPIRED' | 'PAID_LATE' | 'ERROR';
   utr?: string;
   error?: string;
 }

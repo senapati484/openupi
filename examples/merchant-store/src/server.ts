@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from 'express';
-import { OpenUPI, verifyWebhookSignature } from 'openupi-sdk';
+import { OpenUPI, createExpressWebhookHandler } from 'openupi-sdk';
 
 const app = express();
 const PORT = 5000;
@@ -10,8 +10,7 @@ const upi = new OpenUPI({
   apiKey: process.env.OPENUPI_API_KEY || 'sk_live_demo12345678',
 });
 
-// Use raw body for webhook verification
-app.use('/webhook/openupi', express.raw({ type: 'application/json' }));
+// Middleware
 app.use(express.json());
 
 /**
@@ -38,35 +37,26 @@ app.post('/api/checkout', async (req: Request, res: Response) => {
 });
 
 /**
- * 2. Webhook Listener — OpenUPI backend confirms payment
+ * 2. Webhook Listener — Zero-boilerplate HMAC verification & fulfillment
  */
-app.post('/webhook/openupi', (req: Request, res: Response) => {
-  const rawBody = req.body.toString();
-  const signature = req.headers['x-openupi-signature'] as string;
-  const timestamp = req.headers['x-openupi-timestamp'] as string;
-
-  const isValid = verifyWebhookSignature({
-    rawBody,
-    signature,
-    timestamp,
+app.post(
+  '/webhook/openupi',
+  express.raw({ type: '*/*' }),
+  createExpressWebhookHandler({
     secret: process.env.OPENUPI_API_KEY || 'sk_live_demo12345678',
-  });
-
-  if (!isValid) {
-    console.warn('[Store Webhook] Invalid HMAC signature or expired timestamp');
-    return res.status(401).send('Unauthorized');
-  }
-
-  const payload = JSON.parse(rawBody);
-  console.log(`[Store Webhook] ✅ Payment Settled for Order: ${payload.orderId} | UTR: ${payload.utr}`);
-
-  // Fulfill merchant product/service here:
-  // - Upgrade user database account
-  // - Send confirmation email
-  // - Unlock digital downloads
-
-  res.status(200).json({ received: true });
-});
+    onPaymentSuccess: async (event) => {
+      console.log(`[Store Webhook] ✅ Payment Settled for Order: ${event.orderId} | ₹${event.exactAmount} | UTR: ${event.utr}`);
+      // Fulfill merchant product/service here (e.g. update user DB, send email, unlock download)
+    },
+    onPaymentLate: async (event) => {
+      console.log(`[Store Webhook] ⚠️ Late payment recovered for Order: ${event.orderId} | UTR: ${event.utr}`);
+      // Gracefully credit user account
+    },
+    onError: (err) => {
+      console.error('[Store Webhook Error]', err.message);
+    }
+  })
+);
 
 app.listen(PORT, () => {
   console.log(`🚀 Merchant store backend running on http://localhost:${PORT}`);

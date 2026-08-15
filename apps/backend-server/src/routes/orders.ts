@@ -127,4 +127,24 @@ export async function ordersRoutes(fastify: FastifyInstance): Promise<void> {
 
     req.raw.on('close', () => clearInterval(poll));
   });
+
+  // ── POST /api/v1/orders/:orderId/claim-utr ────────────────────────────────
+  fastify.post('/:orderId/claim-utr', async (req, reply) => {
+    const { orderId } = req.params as { orderId: string };
+    const { utr } = req.body as { utr?: string };
+
+    if (!utr || typeof utr !== 'string' || utr.trim().length < 6) {
+      return reply.status(400).send({ error: 'A valid 12-digit UPI UTR / RRN is required' });
+    }
+
+    const { claimUtrForOrder } = await import('../services/MatchingEngine.js');
+    const result = await claimUtrForOrder(orderId, utr);
+
+    if (result.success) {
+      return reply.status(200).send(result);
+    } else {
+      return reply.status(422).send(result);
+    }
+  });
 }
+
