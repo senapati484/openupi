@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ── OpenUPI Backend Gateway ───────────────────────────────────────────────
+  openupi-backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    restart: always
+    ports:
+      - "4000:4000"
+    env_file:
+      - ../.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/openupi
+      - REDIS_URI=redis://redis:6379
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── MongoDB ───────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:6.0
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ─────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Cloudflare Tunnel (Optional) ──────────────────────────────────────────
+  # Uncomment if running on a home/office server without a public static IP.
+  # Create a tunnel at https://one.dash.cloudflare.com and paste the token below.
+  #
+  # cloudflared:
+  #   image: cloudflare/cloudflared:latest
+  #   restart: always
+  #   command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+  #   depends_on:
+  #     - openupi-backend
+
+volumes:
+  mongo_data:
+  redis_data:

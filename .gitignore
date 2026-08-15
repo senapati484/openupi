@@ -1,0 +1,18 @@
+# Environment
+.env
+*.env.local
+
+# Dependencies & Build artifacts
+node_modules/
+dist/
+.next/
+*.log
+.DS_Store
+
+# Android build artifacts
+apps/android-daemon/.gradle/
+apps/android-daemon/build/
+apps/android-daemon/app/build/
+apps/android-daemon/local.properties
+.gradle/
+build/

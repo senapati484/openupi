@@ -1,0 +1,27 @@
+{
+  "name": "@openupi/backend-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "fastify": "^4.26.2",
+    "mongoose": "^8.2.2",
+    "ioredis": "^5.3.2",
+    "bullmq": "^5.4.3",
+    "qrcode": "^1.5.3",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.28",
+    "@types/qrcode": "^1.5.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0"
+  }
+}
