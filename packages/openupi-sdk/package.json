@@ -2,27 +2,50 @@
   "name": "openupi-sdk",
   "version": "1.0.0",
   "description": "Zero-fee self-hosted UPI payment gateway SDK and React checkout widgets",
+  "keywords": [
+    "upi",
+    "payment",
+    "india",
+    "fintech",
+    "qr-code",
+    "react",
+    "nextjs",
+    "express",
+    "fastify",
+    "webhook",
+    "self-hosted",
+    "zero-fee",
+    "openupi"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/senapati484/openupi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/senapati484/openupi/issues"
+  },
+  "homepage": "https://github.com/senapati484/openupi/tree/main/packages/openupi-sdk#readme",
   "license": "MIT",
   "author": "Sayan Senapati",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./node": {
       "types": "./dist/node/index.d.ts",
-      "import": "./dist/node/index.mjs",
-      "require": "./dist/node/index.js"
+      "import": "./dist/node/index.js",
+      "require": "./dist/node/index.cjs"
     },
     "./react": {
       "types": "./dist/react/index.d.ts",
-      "import": "./dist/react/index.mjs",
-      "require": "./dist/react/index.js"
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs"
     }
   },
   "files": [

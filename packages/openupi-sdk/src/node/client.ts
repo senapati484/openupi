@@ -78,11 +78,16 @@ export class OpenUPI {
     claimUtr: async (orderId: string, utr: string): Promise<ClaimUtrResponse> => {
       const res = await fetch(`${this.baseUrl}/api/v1/orders/${orderId}/claim-utr`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey
+        },
         body: JSON.stringify({ utr })
       });
+      if (!res.ok) throw new Error(`[OpenUPI] UTR claim failed for ${orderId} (${res.status})`);
       return res.json() as Promise<ClaimUtrResponse>;
     },
+
 
     /**
      * Returns the full SSE stream URL for real-time order status updates.

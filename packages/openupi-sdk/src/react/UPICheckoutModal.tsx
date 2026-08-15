@@ -30,10 +30,16 @@ export const UPICheckoutModal: React.FC<UPICheckoutModalProps> = ({
   const paymentState = useUPIStatus(gatewayUrl, orderId);
 
   useEffect(() => {
-    if ((paymentState.status === 'PAID' || paymentState.status === 'PAID_LATE') && paymentState.utr) {
+    if (
+      (paymentState.status === 'PAID' || paymentState.status === 'PAID_LATE') &&
+      paymentState.utr
+    ) {
       onSuccess({ utr: paymentState.utr });
     }
-  }, [paymentState, onSuccess]);
+    if (paymentState.status === 'EXPIRED') {
+      onExpire?.();
+    }
+  }, [paymentState.status, paymentState.utr, onSuccess, onExpire]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -124,8 +130,23 @@ export const UPICheckoutModal: React.FC<UPICheckoutModalProps> = ({
       </div>
 
       <div style={{ marginTop: '14px', fontSize: '12px', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>Status: <strong style={{ color: '#0284c7' }}>Listening for payment...</strong></span>
-        <span>⏱️ {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, '0')}</span>
+        <span>
+          Status:{' '}
+          <strong style={{
+            color:
+              paymentState.status === 'PAID' || paymentState.status === 'PAID_LATE' ? '#16A34A'
+              : paymentState.status === 'EXPIRED' ? '#DC2626'
+              : paymentState.status === 'ERROR' ? '#D97706'
+              : '#0284c7'
+          }}>
+            {paymentState.status === 'PENDING' ? 'Listening for payment...' : null}
+            {paymentState.status === 'PAID' ? '✓ Payment Received!' : null}
+            {paymentState.status === 'PAID_LATE' ? '✓ Payment Received (Late)' : null}
+            {paymentState.status === 'EXPIRED' ? '⏱ Order Expired' : null}
+            {paymentState.status === 'ERROR' ? '⚠ Stream Error — Reconnecting...' : null}
+          </strong>
+        </span>
+        <span>⏱ {Math.floor(seconds / 60)}:{(seconds % 60).toString().padStart(2, '0')}</span>
       </div>
 
       <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px dashed #E2E8F0' }}>

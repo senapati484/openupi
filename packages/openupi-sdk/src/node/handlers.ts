@@ -123,3 +123,107 @@ export function createNextWebhookHandler(options: WebhookHandlerOptions) {
     }
   };
 }
+/**
+ * Creates a Fastify v4+ route handler for OpenUPI Webhooks.
+ *
+ * @example
+ * ```typescript
+ * import Fastify from 'fastify';
+ * import { createFastifyWebhookHandler } from 'openupi-sdk/node';
+ *
+ * const app = Fastify();
+ * // addContentTypeParser lets Fastify pass raw Buffer to handler
+ * app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
+ *
+ * app.post('/api/webhooks/openupi', createFastifyWebhookHandler({
+ *   secret: process.env.OPENUPI_API_KEY!,
+ *   onPaymentSuccess: async (event) => {
+ *     console.log(`Paid: ${event.orderId} | UTR: ${event.utr}`);
+ *   }
+ * }));
+ * ```
+ */
+export function createFastifyWebhookHandler(options: WebhookHandlerOptions) {
+  return async (request: any, reply: any) => {
+    try {
+      const rawBody: string =
+        typeof request.body === 'string'
+          ? request.body
+          : Buffer.isBuffer(request.body)
+          ? request.body.toString('utf8')
+          : JSON.stringify(request.body) ?? '';
+
+      const signature = (request.headers['x-openupi-signature'] as string) || '';
+      const timestamp = (request.headers['x-openupi-timestamp'] as string) || '';
+
+      const isValid = verifyWebhookSignature({
+        rawBody,
+        signature,
+        timestamp,
+        secret: options.secret,
+        toleranceMs: options.toleranceMs || 300_000,
+      });
+
+      if (!isValid) {
+        return reply.status(401).send({ error: 'Invalid HMAC signature or expired timestamp' });
+      }
+
+      const event: PaymentWebhookPayload = JSON.parse(rawBody);
+
+      if (event.status === 'PAID') {
+        await options.onPaymentSuccess(event);
+      } else if (event.status === 'PAID_LATE' && options.onPaymentLate) {
+        await options.onPaymentLate(event);
+      } else if (event.status === 'PAID_LATE') {
+        await options.onPaymentSuccess(event);
+      }
+
+      return reply.status(200).send({ received: true, orderId: event.orderId });
+    } catch (err: any) {
+      if (options.onError) {
+        options.onError(err);
+      }
+      return reply.status(500).send({ error: err.message || 'Webhook processing failed' });
+    }
+  };
+}
+
+/**
+ * Framework-agnostic webhook processor. Use when you need to handle OpenUPI webhooks
+ * with a custom server or a framework not covered by the built-in helpers.
+ *
+ * @returns The parsed event payload if verification succeeds, throws otherwise.
+ *
+ * @example
+ * ```typescript
+ * import { processWebhookPayload } from 'openupi-sdk/node';
+ *
+ * const event = await processWebhookPayload({
+ *   rawBody: req.body.toString(),
+ *   signature: req.headers['x-openupi-signature'],
+ *   timestamp: req.headers['x-openupi-timestamp'],
+ *   secret: process.env.OPENUPI_API_KEY!,
+ * });
+ * // event.orderId, event.utr, event.status
+ * ```
+ */
+export function processWebhookPayload({
+  rawBody,
+  signature,
+  timestamp,
+  secret,
+  toleranceMs = 300_000,
+}: {
+  rawBody: string | Buffer;
+  signature: string;
+  timestamp: string;
+  secret: string;
+  toleranceMs?: number;
+}): PaymentWebhookPayload {
+  const isValid = verifyWebhookSignature({ rawBody, signature, timestamp, secret, toleranceMs });
+  if (!isValid) {
+    throw new Error('[OpenUPI] Invalid webhook signature or timestamp out of tolerance window');
+  }
+  const bodyStr = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf-8');
+  return JSON.parse(bodyStr) as PaymentWebhookPayload;
+}
