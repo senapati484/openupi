@@ -3,8 +3,8 @@
 > Universal JavaScript / TypeScript SDK & React UI widgets for OpenUPI — zero-fee self-hosted UPI payment gateway.
 
 Dual ESM/CJS support with optimized subpath exports:
-- `openupi-sdk` (Root): Node.js client, HMAC webhook validation, and core TypeScript interfaces.
-- `openupi-sdk/react`: Headless React hook (`useUPIStatus`) and prebuilt checkout components (`UPICheckoutModal`, `UPICheckoutButton`).
+- `openupi-sdk` (Root): Node.js client, order creation, transaction ledgers, HMAC webhook verification, and core TypeScript interfaces.
+- `openupi-sdk/react`: Drop-in checkout widgets (`UPICheckoutModal`, `UPICheckoutButton`, `UPIQRCode`), prebuilt admin dashboard (`UPIMerchantDashboard`), and headless SSE status hook (`useUPIStatus`).
 
 ---
 
@@ -14,7 +14,7 @@ Dual ESM/CJS support with optimized subpath exports:
 npm install openupi-sdk
 ```
 
-*(Note: If you only use the Node.js backend client, React is an optional peer dependency and will not be pulled into your dependencies.)*
+*(Note: If you only use the Node.js backend client, React is an optional peer dependency and will not be installed.)*
 
 ---
 
@@ -74,11 +74,24 @@ app.post('/api/webhooks/openupi', express.raw({ type: '*/*' }), (req, res) => {
 });
 ```
 
+### 3. Query Transaction Ledgers & Admin Stats
+
+```typescript
+// Get overall gateway volume & stats
+const stats = await upi.admin.stats();
+
+// Fetch paginated transaction history
+const { transactions, total } = await upi.admin.transactions({ limit: 20, page: 1 });
+
+// Reconcile an unmatched bank credit manually
+await upi.admin.reconcile('unmatched_id_123', 'ORD_1001');
+```
+
 ---
 
 ## Frontend Usage (React / Next.js)
 
-### 1. Drop-In Modal Widget
+### 1. Drop-In Checkout Modal Widget
 
 ```tsx
 import { UPICheckoutModal } from 'openupi-sdk/react';
@@ -102,7 +115,36 @@ export function CheckoutPage({ order }) {
 }
 ```
 
-### 2. Headless SSE Hook
+### 2. Prebuilt Admin Dashboard Widget (`<UPIMerchantDashboard />`)
+
+Drop a complete real-time transaction ledger and metrics panel into any admin page with one line of code:
+
+```tsx
+import { UPIMerchantDashboard } from 'openupi-sdk/react';
+
+export default function AdminPage() {
+  return (
+    <UPIMerchantDashboard
+      gatewayUrl="https://pay.yourdomain.com"
+      apiKey={process.env.NEXT_PUBLIC_OPENUPI_KEY!}
+    />
+  );
+}
+```
+
+### 3. Standalone QR Code Component (`<UPIQRCode />`)
+
+```tsx
+import { UPIQRCode } from 'openupi-sdk/react';
+
+<UPIQRCode
+  qrSvg={order.qrSvg}
+  exactAmount={order.exactAmount}
+  vpa="yourbusiness@okaxis"
+/>
+```
+
+### 4. Headless SSE Hook (`useUPIStatus`)
 
 ```tsx
 import { useUPIStatus } from 'openupi-sdk/react';
