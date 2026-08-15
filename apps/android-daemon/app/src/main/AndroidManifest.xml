@@ -20,7 +20,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="OpenUPI Daemon"
+        android:label="OpenUPI"
         android:theme="@style/Theme.OpenUPI">
 
         <!-- System Notification Interceptor (for UPI Apps: GPay, PhonePe, Paytm) -->

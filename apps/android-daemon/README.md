@@ -1,7 +1,7 @@
-# OpenUPI Android Daemon
+# OpenUPI: Android Payment Listener & Free Smart Soundbox
 
-> **The Hardware Interception & Soundbox App for OpenUPI.**  
-> Listens for incoming bank SMS alerts and UPI app push notifications (GPay, PhonePe, Paytm), dispatches HMAC-signed payment events to your self-hosted backend, and announces audio confirmations via TTS.
+> **The Hardware Interception & 100% Free UPI Soundbox App for OpenUPI.**  
+> Listens for incoming UPI app push notifications (GPay, PhonePe, Paytm, BHIM, CRED) and Bank SMS alerts, announces instant voice confirmations through the phone speaker, and dispatches HMAC-signed payment events to your self-hosted backend.
 
 <p align="center">
   <a href="https://sourceforge.net/projects/openupi/"><img src="https://img.shields.io/badge/Download%20APK-SourceForge-brightgreen" alt="Download APK on SourceForge" /></a>
@@ -12,18 +12,16 @@
 
 ## 📱 Features
 
-1. **Dual Interception Engine**:
-   - **Native Bank SMS**: Intercepts `android.provider.Telephony.SMS_RECEIVED` directly from the telephony layer for all major Indian banks (SBI, HDFC, ICICI, Axis, Kotak, UCO Bank, Union Bank, etc.).
-   - **UPI Push Notifications**: Intercepts notifications from Google Pay, PhonePe, Paytm, and BHIM using Android `NotificationListenerService`.
-2. **Built-in Soundbox TTS**:
-   - Speaks payment confirmations through the phone speaker (e.g. *"Received 499 Rupees and 4 paise on UPI"*).
-3. **Offline Queue & Retries**:
-   - Persists all captured payments to a local **Room SQLite Database** before network dispatch.
-   - Uses **Android WorkManager** with network constraints to guarantee delivery even during temporary Wi-Fi / cellular dropouts.
-4. **HMAC-SHA256 Security**:
-   - Every outgoing HTTP payload is signed using a 32-byte shared secret key with strict 5-minute replay window timestamp verification.
-5. **Periodic Heartbeat & Telemetry**:
-   - Dispatches battery level (%), charging state, and connectivity status every 60 seconds to your backend server.
+1. **Standalone 0-Cost Smart Soundbox**:
+   - **No backend server required!** Install on any spare Android phone, enable Notification Listener, and the phone will announce incoming payments out loud in real-time (e.g. *"Received 499 Rupees on UPI"*), replacing expensive hardware soundboxes.
+2. **Dual Notification & Bank SMS Interception**:
+   - Intercepts notifications from Google Pay, PhonePe, Paytm, BHIM, CRED, and all major Indian banking SMS alerts using Android's native `NotificationListenerService`.
+3. **Automated Gateway Dispatch (Optional)**:
+   - When paired with your OpenUPI backend, dispatches HMAC-SHA256 signed payment events to automatically match and confirm orders on your website.
+4. **Offline Queue & Guaranteed Retries**:
+   - Persists captured payments to a local **Room SQLite Database** and utilizes **Android WorkManager** for guaranteed delivery even during network dropouts.
+5. **Periodic Telemetry & Heartbeat**:
+   - Dispatches battery level (%), charging state, and connectivity status every 60 seconds.
 
 ---
 

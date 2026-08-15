@@ -26,6 +26,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -94,14 +95,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ── Main Shell with Premium Navigation ────────────────────────────────────────
+// ── Main Shell with Navigation ───────────────────────────────────────────────
 @Composable
 fun OpenUPIMainScreen() {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         TabItem("Console", Icons.Filled.Terminal),
         TabItem("Credentials", Icons.Filled.Key),
-        TabItem("Audio & Rules", Icons.Filled.VolumeUp),
+        TabItem("Soundbox & Rules", Icons.AutoMirrored.Filled.VolumeUp),
         TabItem("Diagnostics", Icons.Filled.Speed)
     )
 
@@ -155,7 +156,7 @@ fun OpenUPIMainScreen() {
                                 }
                             }
                             Text(
-                                "Payment Listener Daemon",
+                                "Gateway & Smart Soundbox",
                                 fontSize = 11.sp,
                                 color = Color(0xFF94A3B8)
                             )
@@ -189,7 +190,7 @@ fun OpenUPIMainScreen() {
                     }
                 }
 
-                // ── Scrollable Tab Bar (No cramped wrapping) ──────────────────────
+                // ── Scrollable Tab Bar ──────────────────────────────────────────
                 ScrollableTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = Color(0xFF131C2E),
@@ -270,7 +271,6 @@ fun ConsoleTab() {
     }
 
     Column(Modifier.fillMaxSize()) {
-        // Status Alerts
         if (!isNotifListenerActive) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF7F1D1D)),
@@ -298,7 +298,7 @@ fun ConsoleTab() {
                             fontSize = 13.sp
                         )
                         Text(
-                            "Daemon cannot capture UPI transactions without notification access.",
+                            "Enable notification access to intercept UPI payments and speak soundbox voice alerts.",
                             color = Color(0xFFFCA5A5),
                             fontSize = 11.sp
                         )
@@ -369,7 +369,7 @@ fun ConsoleTab() {
             }
         }
 
-        // Terminal Output Screen
+        // Monospace Terminal
         SelectionContainer {
             LazyColumn(
                 state = listState,
@@ -397,13 +397,13 @@ fun ConsoleTab() {
                             )
                             Spacer(Modifier.height(10.dp))
                             Text(
-                                "Listening for payments...",
+                                "Listening for UPI payments...",
                                 color = Color(0xFF64748B),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Text(
-                                "Notifications from GPay, PhonePe, Paytm, BHIM,\nand Bank SMS will appear here in real-time.",
+                                "Alerts from GPay, PhonePe, Paytm, BHIM, CRED,\nand Bank SMS will be logged and spoken in real-time.",
                                 color = Color(0xFF475569),
                                 fontSize = 11.sp,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -446,7 +446,7 @@ fun ConsoleTab() {
     }
 }
 
-// ── Tab 2: All Credentials & Connection Links (Visual Required / Optional) ─────
+// ── Tab 2: Backend Credentials & Links ───────────────────────────────────────
 @Composable
 fun CredentialsAndLinksTab() {
     val context = LocalContext.current
@@ -479,7 +479,6 @@ fun CredentialsAndLinksTab() {
             .verticalScroll(scrollState)
             .padding(bottom = 24.dp)
     ) {
-        // Section Header
         Text(
             "Backend Gateway Credentials",
             fontSize = 17.sp,
@@ -487,13 +486,13 @@ fun CredentialsAndLinksTab() {
             color = Color(0xFF38BDF8)
         )
         Text(
-            "Configure connection parameters. Fields marked with 'REQUIRED' are essential for order matching; others are optional extensions.",
+            "Connect to your self-hosted backend. If you are using OpenUPI purely as a standalone Soundbox, you can leave these blank.",
             fontSize = 12.sp,
             color = Color(0xFF94A3B8),
             modifier = Modifier.padding(top = 2.dp, bottom = 14.dp)
         )
 
-        // ── CARD 1: Core Gateway Connection (REQUIRED) ─────────────────────────
+        // ── CARD 1: Core Gateway Connection (REQUIRED FOR GATEWAY MODE) ────────
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF131C2E)),
             shape = RoundedCornerShape(14.dp),
@@ -531,7 +530,7 @@ fun CredentialsAndLinksTab() {
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
                     shape = RoundedCornerShape(10.dp)
                 )
-                Text("Public domain or IP running the OpenUPI Docker container.", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
+                Text("Public domain or IP running your OpenUPI Docker container.", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 2.dp, bottom = 10.dp))
 
                 // Field 2: Secret Key
                 Text("Device Shared Secret (HMAC)", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFCBD5E1))
@@ -557,7 +556,7 @@ fun CredentialsAndLinksTab() {
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                     shape = RoundedCornerShape(10.dp)
                 )
-                Text("Used to HMAC-SHA256 sign every dispatched payment event.", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 2.dp))
+                Text("Used to HMAC-SHA256 sign payment events dispatched to your server.", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 2.dp))
             }
         }
 
@@ -702,7 +701,6 @@ fun CredentialsAndLinksTab() {
             Text("Save All Credentials", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         }
 
-        // Success Status Toast Card
         AnimatedVisibility(visible = saveStatus.isNotEmpty()) {
             Surface(
                 shape = RoundedCornerShape(10.dp),
@@ -725,7 +723,7 @@ fun CredentialsAndLinksTab() {
     }
 }
 
-// ── Tab 3: Bank Keywords & Audio Settings ─────────────────────────────────────
+// ── Tab 3: Soundbox TTS & Bank Rules ──────────────────────────────────────────
 @Composable
 fun BankAndAudioTab() {
     val context = LocalContext.current
@@ -749,10 +747,32 @@ fun BankAndAudioTab() {
             .verticalScroll(scrollState)
             .padding(bottom = 24.dp)
     ) {
-        Text("Bank Rules & Soundbox TTS", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
-        Text("Configure SMS headers allowlist and real-time voice speech confirmation.", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 2.dp, bottom = 14.dp))
+        Text("Smart Soundbox & Bank Rules", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8))
+        Text("Turn any Android device into a 100% free UPI Soundbox with instant voice announcements.", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 2.dp, bottom = 14.dp))
 
-        // Card 1: Bank Allowlist
+        // Standalone Soundbox Highlight Banner
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F2A4A)),
+            shape = RoundedCornerShape(12.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF0284C7).copy(alpha = 0.5f)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 14.dp)
+        ) {
+            Row(
+                Modifier.padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(26.dp))
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text("Zero-Cost Soundbox Mode", color = Color(0xFF7DD3FC), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("No server setup required. As long as Notification Listener is enabled, incoming GPay, PhonePe, Paytm, BHIM, and Bank SMS alerts will be spoken out loud immediately.", color = Color(0xFFBAE6FD), fontSize = 11.sp)
+                }
+            }
+        }
+
+        // Card 1: Soundbox Audio
         Card(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF131C2E)),
             shape = RoundedCornerShape(14.dp),
@@ -760,35 +780,6 @@ fun BankAndAudioTab() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 14.dp)
-        ) {
-            Column(Modifier.padding(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.FilterList, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Bank SMS Headers Allowlist", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
-                }
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = bankKeywords,
-                    onValueChange = { bankKeywords = it },
-                    placeholder = { Text("UCOBNK, SBINB, HDFCBK, ICICIB...") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = outlinedTextFieldColors(),
-                    minLines = 3,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                Text("Matches standard TRAI DLT banking SMS sender IDs (e.g. VM-UCOBNK, BW-HDFCBK, AX-SBINB).", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 4.dp))
-            }
-        }
-
-        // Card 2: Soundbox Audio
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF131C2E)),
-            shape = RoundedCornerShape(14.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155)),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
         ) {
             Column(Modifier.padding(14.dp)) {
                 Row(
@@ -821,10 +812,39 @@ fun BankAndAudioTab() {
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF38BDF8)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Filled.VolumeUp, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
                     Text("Play Test Soundbox Announcement", fontSize = 13.sp)
                 }
+            }
+        }
+
+        // Card 2: Bank Allowlist
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF131C2E)),
+            shape = RoundedCornerShape(14.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Column(Modifier.padding(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.FilterList, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Bank SMS Headers Allowlist", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = bankKeywords,
+                    onValueChange = { bankKeywords = it },
+                    placeholder = { Text("UCOBNK, SBINB, HDFCBK, ICICIB...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = outlinedTextFieldColors(),
+                    minLines = 3,
+                    shape = RoundedCornerShape(10.dp)
+                )
+                Text("Matches standard TRAI DLT banking SMS sender IDs (e.g. VM-UCOBNK, BW-HDFCBK, AX-SBINB).", fontSize = 11.sp, color = Color(0xFF64748B), modifier = Modifier.padding(top = 4.dp))
             }
         }
 
@@ -836,7 +856,7 @@ fun BankAndAudioTab() {
                         prefs[KEY_BANK_KEYWORDS] = bankKeywords.trim()
                         prefs[KEY_ENABLE_TTS] = enableTts
                     }
-                    saveMsg = "Bank & Audio settings saved ✓"
+                    saveMsg = "Soundbox & Rules saved ✓"
                     delay(3500)
                     saveMsg = ""
                 }

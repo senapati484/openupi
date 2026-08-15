@@ -5,16 +5,27 @@
 <h1 align="center">OpenUPI</h1>
 
 <p align="center">
-  <b>Zero-Fee, Self-Hosted UPI Payment Gateway for Merchants & Developers</b><br />
-  Direct settlement into your bank account. No middlemen. Fully automated order matching.
+ # OpenUPI: Zero-Fee Self-Hosted UPI Payment Gateway & Free Soundbox
+
+> **Self-hosted, zero-fee payment gateway and free smart soundbox for Indian developers & merchants.**  
+> 💸 **0% Transaction Fees** • 🔒 **100% Private & Self-Hosted** • 🔊 **Zero-Cost Standalone Soundbox** • ⚡ **Instant Settlement Direct to Bank Account**
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=blue&label=npm%20openupi-sdk" alt="npm openupi-sdk" /></a>
+  <a href="https://www.npmjs.com/package/openupi-sdk"><img src="https://img.shields.io/npm/v/openupi-sdk?color=cb3837&label=npm%20openupi-sdk" alt="npm version" /></a>
   <a href="https://sourceforge.net/projects/openupi/"><img src="https://img.shields.io/badge/Download%20APK-SourceForge-brightgreen" alt="Download APK on SourceForge" /></a>
   <a href="https://github.com/senapati484/openupi/releases"><img src="https://img.shields.io/github/v/release/senapati484/openupi?label=GitHub%20Release" alt="GitHub Release" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="License: MIT" /></a>
 </p>
+
+---
+
+## 🎯 2 Ways to Use OpenUPI
+
+| Mode | Who it's for | How it works |
+| :--- | :--- | :--- |
+| 🌐 **1. Payment Gateway Mode** | Developers, SaaS, E-commerce | Run the Docker backend, install `openupi-sdk`, and automate 0-fee checkouts with real-time webhooks. |
+| 🔊 **2. Standalone Free Soundbox Mode** | Physical Shops, Kiranas, Merchants | **No server required!** Install the app on any old Android phone. It announces *"Received ₹500 on UPI"* out loud in real-time from Google Pay, PhonePe, Paytm, BHIM & Bank SMS — **replacing ₹125/month hardware soundboxes for ₹0**. |
 
 ---
 
