@@ -2,8 +2,9 @@ package com.openupi.daemon.service
 
 import android.content.Context
 import android.os.BatteryManager
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.work.*
+import com.openupi.daemon.data.AppSettings
+import com.openupi.daemon.data.dataStore
 import com.openupi.daemon.network.NetworkClient
 import com.openupi.daemon.ui.LiveLogBus
 import kotlinx.coroutines.flow.first
@@ -16,8 +17,8 @@ class HeartbeatWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val prefs = applicationContext.dataStore.data.first()
-        val serverUrl = prefs[stringPreferencesKey("server_url")] ?: return Result.failure()
-        val deviceSecret = prefs[stringPreferencesKey("secret_key")] ?: return Result.failure()
+        val serverUrl = prefs[AppSettings.KEY_SERVER_URL] ?: return Result.failure()
+        val deviceSecret = prefs[AppSettings.KEY_SECRET_KEY] ?: return Result.failure()
 
         val bm = applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val batteryLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
@@ -30,10 +31,6 @@ class HeartbeatWorker(context: Context, params: WorkerParameters) :
     }
 
     companion object {
-        /**
-         * Schedules the periodic heartbeat (every 1 minute).
-         * Safe to call on every app start — WorkManager deduplicates unique work.
-         */
         fun schedulePeriodicHeartbeat(context: Context) {
             val request = PeriodicWorkRequestBuilder<HeartbeatWorker>(1, TimeUnit.MINUTES)
                 .setConstraints(

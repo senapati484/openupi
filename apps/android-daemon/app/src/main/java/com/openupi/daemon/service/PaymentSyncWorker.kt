@@ -1,12 +1,12 @@
 package com.openupi.daemon.service
 
 import android.content.Context
-import android.os.BatteryManager
 import android.util.Log
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.work.*
 import com.openupi.daemon.data.AppDatabase
+import com.openupi.daemon.data.AppSettings
 import com.openupi.daemon.data.QueuedPayment
+import com.openupi.daemon.data.dataStore
 import com.openupi.daemon.network.NetworkClient
 import com.openupi.daemon.ui.LiveLogBus
 import kotlinx.coroutines.flow.first
@@ -20,8 +20,8 @@ class PaymentSyncWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val prefs = applicationContext.dataStore.data.first()
-        val serverUrl = prefs[stringPreferencesKey("server_url")] ?: return Result.failure()
-        val deviceSecret = prefs[stringPreferencesKey("secret_key")] ?: return Result.failure()
+        val serverUrl = prefs[AppSettings.KEY_SERVER_URL] ?: return Result.failure()
+        val deviceSecret = prefs[AppSettings.KEY_SECRET_KEY] ?: return Result.failure()
 
         val dao = AppDatabase.get(applicationContext).paymentDao()
         val pending = dao.getAllPending()
@@ -59,10 +59,6 @@ class PaymentSyncWorker(context: Context, params: WorkerParameters) :
     }
 
     companion object {
-        /**
-         * Enqueues a one-time expedited sync, with backoff on retry.
-         * Safe to call multiple times — WorkManager deduplicates.
-         */
         fun enqueue(context: Context) {
             val request = OneTimeWorkRequestBuilder<PaymentSyncWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

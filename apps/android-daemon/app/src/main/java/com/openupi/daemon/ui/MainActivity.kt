@@ -501,7 +501,7 @@ fun DiagnosticsTab() {
 
                 if (pingStatus != null) {
                     Spacer(Modifier.height(8.dp))
-                    Text(pingStatus!, color = if (pingStatus!!.contains("OK")) Color(0xFF34D399) else Color(0xFFF87171), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = pingStatus!!, color = if (pingStatus!!.contains("OK")) Color(0xFF34D399) else Color(0xFFF87171), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

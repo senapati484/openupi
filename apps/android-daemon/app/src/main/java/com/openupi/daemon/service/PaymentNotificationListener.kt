@@ -1,5 +1,6 @@
 package com.openupi.daemon.service
 
+import android.content.ComponentName
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -62,6 +63,6 @@ class PaymentNotificationListener : NotificationListenerService() {
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         Log.w(TAG, "Notification listener disconnected — requesting rebind")
-        requestRebind(componentName)
+        requestRebind(ComponentName(this, PaymentNotificationListener::class.java))
     }
 }
